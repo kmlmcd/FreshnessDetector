@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ciri-Ciri Buah Segar dan Busuk - AI Vision</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #0f0c29; 
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            padding: 60px 20px;
+        }
+
+        .btn-back {
+            color: #00ffff;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+            margin-bottom: 30px;
+        }
+
+        .btn-back:hover {
+            color: white;
+            transform: translateX(-5px);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #fff;
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+            margin-bottom: 40px;
+        }
+
+        /* Card Manfaat */
+        .benefit-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            transition: 0.3s;
+        }
+
+        .benefit-card:hover {
+            border-color: #00ffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .benefit-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .benefit-header i {
+            font-size: 2rem;
+            color: #00ffff;
+        }
+
+        .benefit-header h3 {
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .benefit-card p {
+            color: #a5f3fc;
+            line-height: 1.7;
+            margin: 0;
+            text-align: justify;
+        }
+
+        .robot-bg-element {
+            position: fixed; /* Tetap di posisi meskipun di-scroll */
+            width: 300px;    /* Sesuaikan ukuran gambar */
+            height: auto;
+            opacity: 0.2;    /* Membuatnya agak transparan agar teks tetap terbaca */
+            z-index: -1;     /* Menaruh gambar di belakang konten utama */
+            pointer-events: none; /* Agar tidak bisa diklik/mengganggu interaksi */
+        }
+
+        /* Contoh posisi di kanan bawah */
+        .robot-right {
+            bottom: 20px;
+            right: 20px;
+        }
+
+        /* Contoh posisi di kiri atas */
+        .robot-left {
+            top: 100px;
+            left: -50px;
+            transform: rotate(15deg); /* Memutar sedikit agar artistik */
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8rem; }
+            .benefit-header i { font-size: 1.5rem; }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .robot-floating {
+            position: fixed;
+            width: 250px; /* Ukuran robot */
+            height: auto;
+            opacity: 0.15; /* Biar tipis-tipis aja di background */
+            z-index: -1;
+            pointer-events: none;
+            animation: float 4s ease-in-out infinite; /* Kecepatan melayang 4 detik */
+        }
+
+        /* Posisi Robot 1 (Kanan Bawah) */
+        .robot-1 {
+            bottom: 5%;
+            right: 5%;
+        }
+
+        /* Posisi Robot 2 (Kiri Tengah) - Opsional kalau mau dua */
+        .robot-2 {
+            top: 20%;
+            left: 2%;
+            animation-delay: 2s; /* Biar geraknya gak barengan */
+            width: 180px;
+        }
+    </style>
+    
+</head>
+<body>
+    <img src="/static/robot1.png" class="robot-floating robot-1" alt="Robot Decor">
+    <img src="/static/robot1.png" class="robot-floating robot-2" alt="Robot Decor">
+
+    <div class="container">
+        <a href="/" class="btn-back">
+            <i class="fas fa-arrow-left"></i> KEMBALI KE HOME
+        </a>
+
+        <h1>Ciri-Ciri Buah Segar dan Busuk</h1>
+
+        <div class="benefit-card">
+            <div class="benefit-header">
+                <i class="fas fa-apple-alt"></i>
+                <h3>BUAH APEL</h3>
+            </div>
+            <p>
+            Ciri-ciri apel segar:
+            <br> 
+            1. Kulit cerah dan mengkilap, warna merata
+            <br> 
+            2. Tidak ada bercak atau memar
+            <br> 
+            3. Tekstur kulit halus, tidak lembek
+            <br> 
+            4. Bentuk padat dan utuh, tidak keriput
+            <br><br>
+            Ciri-ciri apel busuk:
+            <br>
+            1. Warna kulit berubah menjadi cokelat tua hingga hitam
+            <br>
+            2. Terdapat bercak busuk dan noda gelap pada permukaan
+            <br>
+            3. Tekstur kulit terlihat lembek, keriput, dan rusak
+            <br>
+            4. Permukaan apel tampak basah atau berlendir
+            <br>
+            5. Bentuk buah tidak utuh dan terlihat menyusut
+            </p>
+        </div>
+
+        <div class="benefit-card">
+            <div class="benefit-header">
+                <i class="fas fa-leaf"></i>
+                <h3>BUAH PISANG</h3>
+            </div>
+            <p>
+            Ciri ciri pisang segar:
+            <br>
+            1. Warna kulit kuning cerah hingga kuning tua
+            <br>
+            2. Permukaan kulit halus, tanpa bercak hitam berlebihan
+            <br>
+            3. Tekstur kulit dan daging buah padat dan tidak lembek
+            <br><br>
+            Ciri-ciri pisang busuk:
+            <br>
+            1. Kulit banyak bercak cokelat atau hitam
+            <br>
+            2. Tekstur lembek atau berlendir, mudah hancur
+            <br>
+            3. Bau fermentasi atau busuk
+            <br>
+            4. Kadang daging buah berair dan menghitam
+            </p>
+        </div>
+
+        <div class="benefit-card">
+            <div class="benefit-header">
+                <i class="fas fa-sun"></i>
+                <h3>BUAH JERUK</h3>
+            </div>
+            <p>
+            Ciri-ciri jeruk segar:
+            <br>
+            1. Warna kulit oranye cerah dan merata
+            <br>
+            2. Permukaan kulit kencang dan mengkilap
+            <br>
+            3. Tekstur buah padat saat ditekan
+            <br>
+            4. Tidak terdapat bercak hitam, jamur, atau kerusakan
+            <br>
+            5. Kulit jeruk tidak keriput
+            <br><br>
+            Ciri-ciri jeruk busuk:
+            <br>
+            1. Warna kulit jeruk tidak merata, muncul bercak cokelat dan kehitaman
+            <br>
+            2. Permukaan kulit terlihat kusam dan lembek
+            <br>
+            3. Terdapat tanda jamur atau pembusukan lokal pada beberapa bagian
+            <br>
+            4. Tekstur kulit tidak kencang dan tampak berair
+            </p>
+        </div>
+
+    </div>
+
+</body>
+</html>

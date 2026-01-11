@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Vision - Freshneess Detector</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #0f0c29; 
+            color: white;
+        }
+
+        .ai-section {
+            position: relative; 
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #0f0c29;
+        }
+
+        .site-header {
+            width: 100%;
+            z-index: 30;
+            line-height: 0;
+            position: sticky;
+            top: 0;
+        }
+
+        .header-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
+        }
+
+        .robot-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.7;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px 100px 20px;
+        }
+
+        .hero-text {
+            width: 100%;
+            max-width: 1000px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 25px;
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+        }
+
+        .hero-text p {
+            font-size: 1rem;
+            color: #00ffff;
+            line-height: 1.8;
+            text-align: justify;
+            margin: 0;
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.8);
+        }
+
+        /* --- STYLE BARU UNTUK IKON --- */
+        .icon-nav {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 40px;
+            width: 100%;
+        }
+
+        .icon-item {
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .icon-img {
+            width: 120px !important; /* Atur ukuran ikon di sini */
+            height: 120px !important;
+            object-fit: contain;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.4));
+        }
+
+        .icon-item span {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #00ffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .icon-item:hover {
+            transform: translateY(-8px) scale(1.1);
+            filter: brightness(1.2) drop-shadow(0 0 15px rgba(0, 255, 255, 0.8));
+        }
+
+        /* --- KOTAK ALAT (KAMERA) --- */
+        .detector-overlay {
+            width: 100%;
+            max-width: 700px;
+            line-height: normal; 
+        }
+
+        .preview-box {
+            width: 100%;
+            height: 380px; 
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+        }
+
+        video, #img-preview { width: 100%; height: 100%; object-fit: cover; border-radius: 18px; }
+
+        .btn-custom { font-size: 0.9rem; border-radius: 10px; padding: 12px; font-weight: 600; transition: 0.3s; text-transform: uppercase; }
+        .btn-predict { background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%); border: none; color: white; }
+
+        @media (max-width: 768px) {
+            .hero-text h1 { font-size: 2rem; }
+            .icon-nav { gap: 20px; }
+            .icon-img { width: 45px; height: 45px; }
+            .preview-box { height: 260px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ai-section">
+        <header class="site-header">
+            <img src="/static/header.png" class="header-img" alt="Header">
+        </header>
+
+        <img src="/static/bg-canva.png" class="robot-bg" alt="Robot Design">
+        
+        <div class="content-wrapper">
+            
+            <div class="hero-text">
+                <h1>HOME</h1>
+                <p>
+                    Machine Learning (ML) merupakan pendekatan dalam Artificial Intelligence (AI) yang memungkinkan sistem komputer mempelajari pola dari data untuk menirukan kemampuan manusia dalam mengambil keputusan. Dalam aplikasi ini, Machine Learning digunakan untuk mengidentifikasi tingkat kesegaran buah berdasarkan citra buah yang diperoleh dari foto maupun kamera. Deep Learning merupakan bagian dari Machine Learning yang memanfaatkan jaringan saraf tiruan berlapis untuk mempelajari data citra secara otomatis tanpa memerlukan perancangan fitur secara manual. Salah satu metode Deep Learning yang banyak digunakan dan efektif dalam pengolahan citra adalah Convolutional Neural Network (CNN).
+                    <br><br>
+                    Convolutional Neural Network (CNN) yang kami buat dapat digunakan untuk mendeteksi dan mengklasifikasikan kondisi buah jeruk, pisang, dan apel ke dalam kategori fresh (segar) atau busuk berdasarkan citra yang diperoleh. Aplikasi deteksi kesegaran buah ini dibangun menggunakan pendekatan Machine Learning, khususnya Deep Learning dengan metode CNN. Sistem menerima input citra buah yang diambil melalui kamera secara real-time maupun melalui unggahan file gambar, kemudian memproses citra tersebut untuk menentukan kondisi buah.
+                    <br><br>
+                    CNN mempelajari pola dari data citra selama proses pelatihan sehingga mampu menghasilkan prediksi kondisi buah secara akurat. Hasil prediksi ditampilkan pada antarmuka web dalam bentuk label kondisi buah dan tingkat kepercayaan (confidence). Dengan memanfaatkan CNN, sistem ini mampu melakukan deteksi kesegaran buah secara otomatis, efisien, dan dapat diintegrasikan ke dalam aplikasi berbasis web.
+                </p>
+            </div>
+
+            <div class="icon-nav">
+                <a href="{{ url_for('ciri_ciri') }}" class="icon-item">
+                    <img src="/static/logo-ciriciri.png" class="icon-img" alt="Ciri-Ciri">
+                </a>
+
+                <a href="{{ url_for('manfaat') }}" class="icon-item">
+                    <img src="/static/logo-manfaat.png" class="icon-img" alt="Manfaat">
+                </a>
+            </div>
+            
+            <div class="detector-overlay">
+                <div class="preview-box">
+                    <video id="webcam" autoplay playsinline style="display: none;"></video>
+                    <img id="img-preview" src="#" alt="Preview" style="display: none;">
+                    <div id="status-info" class="text-white opacity-75 small text-center px-3">
+                        SYSTEM READY<br>
+                        <span style="font-size: 0.7rem; opacity: 0.6;">Ambil foto atau unggah file untuk analisis</span>
+                    </div>
+                </div>
+
+                <div class="row g-2 mb-2">
+                    <div class="col-6">
+                        <button id="btn-open-cam" class="btn btn-outline-light w-100 btn-custom">📸 KAMERA</button>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-outline-light w-100 btn-custom" onclick="document.getElementById('image-input').click()">📁 UNGGAH</button>
+                        <input type="file" id="image-input" hidden accept="image/*">
+                    </div>
+                </div>
+
+                <button id="btn-capture" class="btn btn-danger btn-sm w-100 mb-2 fw-bold" style="display: none; border-radius: 10px;">🎯 AMBIL FOTO</button>
+                <button id="btn-predict" class="btn btn-predict w-100 btn-custom fw-bold" disabled>🚀 MULAI ANALISIS</button>
+
+                <div id="result-box" class="result-panel" style="display: none; margin-top: 20px; text-align: center; color: white;">
+                    <p class="text-info small fw-bold mb-1">HASIL ANALISIS:</p>
+                    <h3 id="result-text" class="fw-bold mb-2"></h3>
+                    
+                    <div class="mb-3">
+                        <p class="mb-0 small">Tingkat Kesegaran: <b id="status-text" class="text-warning"></b></p>
+                        <p class="mb-0 small">Persentase: <span id="confidence-text"></span>%</p>
+                    
+                       <div class="progress mt-2" style="height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px;">
+                         <div id="progress-bar" class="progress-bar bg-info" role="progressbar" style="width: 0%"></div>
+                      </div>
+                    </div>
+
+                    <div class="mt-3 p-2" style="background: rgba(0,0,0,0.3); border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
+                        <p class="small mb-1 fw-bold text-info">Keterangan:</p>
+                        <p id="desc-text" class="small opacity-75 mb-0" style="line-height: 1.4;"></p>
+                    </div>
+                </div>
+        
+    <canvas id="canvas" style="display: none;"></canvas>
+
+    <script>
+        // ... (Script JS tetap sama) ...
+        const video = document.getElementById('webcam');
+        const canvas = document.getElementById('canvas');
+        const imgPreview = document.getElementById('img-preview');
+        const statusInfo = document.getElementById('status-info');
+        const imageInput = document.getElementById('image-input');
+        const btnOpenCam = document.getElementById('btn-open-cam');
+        const btnCapture = document.getElementById('btn-capture');
+        const btnPredict = document.getElementById('btn-predict');
+        const resultBox = document.getElementById('result-box');
+
+        let stream = null;
+        let capturedFile = null;
+
+        btnOpenCam.onclick = async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                video.style.display = 'block';
+                imgPreview.style.display = 'none';
+                statusInfo.style.display = 'none';
+                btnCapture.style.display = 'block';
+                btnPredict.disabled = true;
+                resultBox.style.display = 'none';
+            } catch (err) { alert("Akses kamera ditolak"); }
+        };
+
+        btnCapture.onclick = () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            canvas.toBlob((blob) => {
+                capturedFile = new File([blob], "capture.jpg", { type: "image/jpeg" });
+                imgPreview.src = URL.createObjectURL(blob);
+                imgPreview.style.display = 'block';
+                video.style.display = 'none';
+                btnCapture.style.display = 'none';
+                btnPredict.disabled = false;
+                if(stream) stream.getTracks().forEach(track => track.stop());
+            }, 'image/jpeg');
+        };
+
+        imageInput.onchange = () => {
+            const file = imageInput.files[0];
+            if (file) {
+                capturedFile = file;
+                imgPreview.src = URL.createObjectURL(file);
+                imgPreview.style.display = 'block';
+                statusInfo.style.display = 'none';
+                video.style.display = 'none';
+                btnCapture.style.display = 'none';
+                btnPredict.disabled = false;
+                resultBox.style.display = 'none';
+                if(stream) stream.getTracks().forEach(track => track.stop());
+            }
+        };
+
+        btnPredict.onclick = async () => {
+            const formData = new FormData();
+            formData.append('file', capturedFile);
+            btnPredict.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Menganalisis...';
+            
+            try {
+                const res = await fetch('/predict', { method: 'POST', body: formData });
+                const data = await res.json();
+                
+                // Tampilkan Box Hasil
+                resultBox.style.display = 'block';
+                
+                // Masukkan Data Baru ke HTML
+                document.getElementById('result-text').innerText = data.prediction;
+                document.getElementById('status-text').innerText = data.status; // Menampilkan status (misal: Sangat Segar)
+                document.getElementById('desc-text').innerText = data.description; // Menampilkan ciri-ciri
+                
+                const percent = data.display_percent; 
+                document.getElementById('confidence-text').innerText = percent;
+                document.getElementById('progress-bar').style.width = percent + '%';
+                
+                // Update Progress Bar
+                document.getElementById('progress-bar').style.width = percent + '%';
+                
+            } catch (err) { 
+                alert('Gagal memproses data dari server'); 
+            } finally { 
+                btnPredict.innerHTML = '🚀 MULAI ANALISIS'; 
+            }
+        };
+    </script>
+</body>
+</html>
