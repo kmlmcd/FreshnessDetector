@@ -4,22 +4,28 @@ import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 import numpy as np
-import random # Untuk variasi angka di rentang 0-10
+import random
 
 app = Flask(__name__)
 
-# 1. LOAD MODEL
-MODEL_PATH = 'model_uas_cnn.h5'
+# --- PENGATURAN PATH OTOMATIS (AGAR TIDAK ERROR DI CLOUD) ---
+# Mencari folder tempat app.py berada
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# 1. LOAD MODEL (Menggunakan path gabungan)
+MODEL_PATH = os.path.join(BASE_DIR, 'model_uas_cnn.h5')
 model = load_model(MODEL_PATH)
 
 # 2. DAFTAR LABEL
 labels = ['freshapples', 'freshbanana', 'freshoranges', 'rottenapples', 'rottenbanana', 'rottenoranges'] 
 
-UPLOAD_FOLDER = 'static/uploads'
+# 3. PENGATURAN FOLDER UPLOAD
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads')
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 def prepare_image(img_path):
+    # Menggunakan target_size 224x224 sesuai standar CNN kamu
     img = image.load_img(img_path, target_size=(224, 224))
     img_array = image.img_to_array(img)
     img_array = np.expand_dims(img_array, axis=0)
@@ -45,6 +51,7 @@ def predict():
     
     file = request.files['file']
     if file:
+        # Menyimpan file dengan path yang benar di server
         filepath = os.path.join(UPLOAD_FOLDER, file.filename)
         file.save(filepath)
 
@@ -55,7 +62,7 @@ def predict():
         result_index = np.argmax(prediction[0])
         hasil_prediksi = labels[result_index]
         
-        # Confidence asli dari AI (Misal: 0.99)
+        # Confidence asli dari AI
         confidence_score = float(np.max(prediction[0]))
         ai_percent = confidence_score * 100
         
@@ -64,20 +71,13 @@ def predict():
         display_percent = 0 
 
         # --- LOGIKA PENYESUAIAN KESEGARAN ---
-        
-        # JIKA TERDETEKSI BUSUK (rotten)
         if 'rotten' in hasil_prediksi:
             status = "Kualitas Buruk / Busuk"
             description = "Buah sudah tidak layak konsumsi karena kerusakan jaringan yang parah, aroma busuk, dan tekstur hancur."
-            
-            # PAKSA PERSENTASE KE 0 - 10%
-            # Kita gunakan random agar angkanya tidak selalu bulat 0 (biar terlihat natural)
+            # PAKSA KE 0 - 10% agar terlihat natural di UI
             display_percent = random.uniform(0.5, 10.0) 
-            
         else:
-            # JIKA TERDETEKSI SEGAR (fresh)
             display_percent = ai_percent
-            
             if 91 <= display_percent <= 100:
                 status = "Sangat Segar (Optimal)"
                 description = "Warna sangat cerah & merata, permukaan halus, tekstur sangat padat, aroma kuat."
@@ -94,10 +94,12 @@ def predict():
         return jsonify({
             'prediction': hasil_prediksi,
             'confidence': confidence_score, 
-            'display_percent': round(display_percent, 2), # Kirim angka 0-10 jika busuk
+            'display_percent': round(display_percent, 2),
             'status': status,
             'description': description
         })
 
+# --- PERUBAHAN PENTING UNTUK CLOUD ---
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Hapus debug=True agar tidak terjadi error signal/reloader di Streamlit Cloud
+    app.run(host='0.0.0.0', port=5000)
