@@ -1,24 +1,20 @@
 from flask import Flask, render_template, request, jsonify
 import os
-import numpy as np
-import random # Untuk variasi angka di rentang 0-10
+import requests
 
-# Coba import TFLite Runtime (untuk deploy ringan), fallback ke TensorFlow (local)
-try:
-    import tflite_runtime.interpreter as tflite
-except ImportError:
-    import tensorflow.lite as tflite
+# KONFIGURASI HUGGING FACE INFERENCE API
+HF_API_URL = "https://api-inference.huggingface.co/models/kmlmcd/model-freshness-detector"
+# Token ini optional untuk public model, tapi disarankan pakai jika rate limit
+# Pastikan set HF_TOKEN di Environment Variables Render/Vercel
+HF_TOKEN = os.environ.get("HF_TOKEN")
 
-app = Flask(__name__)
+headers = {"Authorization": f"Bearer {HF_TOKEN}"} if HF_TOKEN else {}
 
-# 1. LOAD MODEL TFLITE
-MODEL_PATH = 'model_uas_cnn.tflite'
-interpreter = tflite.Interpreter(model_path=MODEL_PATH)
-interpreter.allocate_tensors()
-
-# Dapat detail input/output model
-input_details = interpreter.get_input_details()
-output_details = interpreter.get_output_details()
+def query_huggingface(filename):
+    with open(filename, "rb") as f:
+        data = f.read()
+    response = requests.post(HF_API_URL, headers=headers, data=data)
+    return response.json()
 
 # 2. DAFTAR LABEL
 labels = ['freshapples', 'freshbanana', 'freshoranges', 'rottenapples', 'rottenbanana', 'rottenoranges'] 
@@ -27,16 +23,7 @@ UPLOAD_FOLDER = 'static/uploads'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
-from PIL import Image
 
-def prepare_image(img_path):
-    # Load gambar pakai Pillow
-    img = Image.open(img_path).convert('RGB')
-    img = img.resize((224, 224))
-    img_array = np.array(img, dtype=np.float32)
-    img_array = np.expand_dims(img_array, axis=0)
-    img_array /= 255.0  
-    return img_array
 
 @app.route('/')
 def home():
@@ -60,21 +47,28 @@ def predict():
         filepath = os.path.join(UPLOAD_FOLDER, file.filename)
         file.save(filepath)
 
-        # PROSES PREDIKSI TFLITE
-        processed_img = prepare_image(filepath)
-        
-        # Set input tensor
-        interpreter.set_tensor(input_details[0]['index'], processed_img)
-        interpreter.invoke()
-        
-        # Ambil hasil output
-        prediction = interpreter.get_tensor(output_details[0]['index'])
-        
-        result_index = np.argmax(prediction[0])
-        hasil_prediksi = labels[result_index]
-        
-        # Confidence asli dari AI (Misal: 0.99)
-        confidence_score = float(np.max(prediction[0]))
+        # PROSES PREDIKSI VIA API HUGGING FACE
+        # Kirim gambar ke server hugging face, biarkan mereka yang memproses
+        try:
+            api_response = query_huggingface(filepath)
+            
+            # Format response HF biasanya list of dict: [{'label': 'freshapples', 'score': 0.99}, ...]
+            # Kita cari yang score-nya paling tinggi
+            if isinstance(api_response, list) and len(api_response) > 0:
+                # Sort berdasarkan score tertinggi
+                top_result = sorted(api_response, key=lambda x: x['score'], reverse=True)[0]
+                hasil_prediksi = top_result['label']
+                confidence_score = top_result['score']
+            else:
+                # Handle error jika model loading / error lain
+                # Fallback sementara (mock) atau return error
+                print("API Error:", api_response)
+                return jsonify({'error': 'Gagal memproses gambar di server AI. Coba lagi nanti.'}), 503
+
+        except Exception as e:
+             print("Error calling API:", e)
+             return jsonify({'error': str(e)}), 500
+
         ai_percent = confidence_score * 100
         
         status = ""
