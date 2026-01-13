@@ -1,6 +1,8 @@
 Flask==3.0.0
-tensorflow-cpu
 Pillow
-huggingface_hub
 numpy
 gunicorn
+# Gunakan tensorflow-cpu di Render (masih cover size limit dengan TFLite)
+tensorflow-cpu; sys_platform != 'linux'
+# Gunakan tflite-runtime di Linux (Render/Vercel) biar ringan
+tflite-runtime; sys_platform == 'linux'
