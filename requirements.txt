@@ -3,4 +3,4 @@ tensorflow-cpu
 Pillow
 huggingface_hub
 numpy
-
+gunicorn
