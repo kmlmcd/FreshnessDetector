@@ -5,4 +5,4 @@ gunicorn
 # Gunakan tensorflow-cpu di Render (masih cover size limit dengan TFLite)
 tensorflow-cpu; sys_platform != 'linux'
 # Gunakan tflite-runtime di Linux (Render/Vercel) biar ringan
-tflite-runtime; sys_platform == 'linux'
+tflite-runtime==2.14.0; sys_platform == 'linux'
