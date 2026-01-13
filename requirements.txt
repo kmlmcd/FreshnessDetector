@@ -1,5 +1,0 @@
-flask
-streamlit
-tensorflow-cpu
-pillow
-numpy
