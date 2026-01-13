@@ -1,28 +1,24 @@
 from flask import Flask, render_template, request, jsonify
 import os
-import tensorflow as tf
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
 import numpy as np
 import random # Untuk variasi angka di rentang 0-10
-from huggingface_hub import hf_hub_download
+
+# Coba import TFLite Runtime (untuk deploy ringan), fallback ke TensorFlow (local)
+try:
+    import tflite_runtime.interpreter as tflite
+except ImportError:
+    import tensorflow.lite as tflite
 
 app = Flask(__name__)
 
-# 1. LOAD MODEL
-MODEL_PATH = 'model_uas_cnn.h5'
+# 1. LOAD MODEL TFLITE
+MODEL_PATH = 'model_uas_cnn.tflite'
+interpreter = tflite.Interpreter(model_path=MODEL_PATH)
+interpreter.allocate_tensors()
 
-if not os.path.exists(MODEL_PATH):
-    # Ganti dengan repo_id dan filename Anda di Hugging Face
-    # Contoh: repo_id="username/repository", filename="model_uas_cnn.h5"
-    REPO_ID = os.environ.get('HF_REPO_ID') 
-    FILENAME = "model_uas_cnn.h5"
-    
-    if REPO_ID:
-        print(f"Downloading model from Hugging Face: {REPO_ID}")
-        MODEL_PATH = hf_hub_download(repo_id=REPO_ID, filename=FILENAME)
-
-model = load_model(MODEL_PATH)
+# Dapat detail input/output model
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
 
 # 2. DAFTAR LABEL
 labels = ['freshapples', 'freshbanana', 'freshoranges', 'rottenapples', 'rottenbanana', 'rottenoranges'] 
@@ -31,9 +27,13 @@ UPLOAD_FOLDER = 'static/uploads'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
+from PIL import Image
+
 def prepare_image(img_path):
-    img = image.load_img(img_path, target_size=(224, 224))
-    img_array = image.img_to_array(img)
+    # Load gambar pakai Pillow
+    img = Image.open(img_path).convert('RGB')
+    img = img.resize((224, 224))
+    img_array = np.array(img, dtype=np.float32)
     img_array = np.expand_dims(img_array, axis=0)
     img_array /= 255.0  
     return img_array
@@ -60,9 +60,15 @@ def predict():
         filepath = os.path.join(UPLOAD_FOLDER, file.filename)
         file.save(filepath)
 
-        # PROSES PREDIKSI
+        # PROSES PREDIKSI TFLITE
         processed_img = prepare_image(filepath)
-        prediction = model.predict(processed_img)
+        
+        # Set input tensor
+        interpreter.set_tensor(input_details[0]['index'], processed_img)
+        interpreter.invoke()
+        
+        # Ambil hasil output
+        prediction = interpreter.get_tensor(output_details[0]['index'])
         
         result_index = np.argmax(prediction[0])
         hasil_prediksi = labels[result_index]
